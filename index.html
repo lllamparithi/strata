@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>STRATA — a core sample</title>
+<meta name="description" content="A vertical descent through three hundred metres of rock. Scroll is depth.">
+<style>
+:root{
+  --ink:#e8e4dc; --dim:#8c8478; --faint:#4a463f;
+  --rule:#2a2724; --bg:#08090b;
+  --hot:#ff7a33;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--mono);
+  font-size:15px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ---------- the shaft ---------- */
+#gl{
+  position:fixed; inset:0; width:100%; height:100%;
+  display:block; z-index:0; pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 15%,#14161b 0%,#08090b 70%);
+}
+/* readable no matter what the GPU says */
+#gl.dead{background:linear-gradient(#1a1712,#2a1a12 40%,#3a1408 75%,#08090b)}
+
+/* ---------- log sheet ---------- */
+main{position:relative; z-index:2}
+.sheet{
+  min-height:100svh; display:flex; align-items:center;
+  padding:12svh clamp(20px,6vw,90px);
+}
+.col{width:100%; max-width:560px; margin-left:auto}  /* right column: field notes beside the core */
+.sheet:nth-child(even) .col{margin-left:0; margin-right:auto}
+
+.tag{
+  display:flex; align-items:baseline; gap:14px;
+  font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--dim); padding-bottom:10px;
+  border-bottom:1px solid var(--rule);
+}
+.tag b{color:var(--ink); font-weight:500; font-variant-numeric:tabular-nums}
+.tag span{margin-left:auto; color:var(--faint)}
+
+h1,h2{
+  font-weight:400; letter-spacing:-.02em; line-height:1.04;
+  margin:26px 0 18px; text-wrap:balance;
+}
+h1{font-size:clamp(46px,11vw,104px)}
+h2{font-size:clamp(28px,5.4vw,52px)}
+
+p{color:#bdb6ab; max-width:52ch; text-wrap:pretty}
+p+p{margin-top:14px}
+.lede{color:var(--ink); font-size:clamp(15px,2vw,18px)}
+
+/* measured facts, set as a table because that is what they are */
+dl{margin-top:26px; border-top:1px solid var(--rule); font-size:12.5px}
+div.row{display:flex; gap:16px; padding:9px 0; border-bottom:1px solid var(--rule)}
+dt{color:var(--faint); letter-spacing:.14em; text-transform:uppercase; font-size:10.5px; width:11ch; flex:none; padding-top:2px}
+dd{color:#a8a196; font-variant-numeric:tabular-nums}
+
+/* reveal — one class, one transition */
+.col>*{opacity:0; transform:translateY(18px); transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+.in>*{opacity:1; transform:none}
+.in>*:nth-child(2){transition-delay:.08s}
+.in>*:nth-child(3){transition-delay:.14s}
+.in>*:nth-child(4){transition-delay:.20s}
+.in>*:nth-child(5){transition-delay:.26s}
+
+/* ---------- instrument panel ---------- */
+#hud{
+  position:fixed; z-index:5; left:0; right:0; bottom:0;
+  display:flex; align-items:flex-end; gap:16px;
+  padding:0 clamp(16px,4vw,40px) clamp(14px,3vw,26px);
+  pointer-events:none; mix-blend-mode:difference;
+}
+#depth{
+  font-size:clamp(30px,7vw,58px); line-height:.9; letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;
+}
+#depth i{font-style:normal; font-size:.34em; letter-spacing:.2em; color:var(--dim); margin-left:.5em}
+#era{
+  margin-left:auto; text-align:right;
+  font-size:10.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--dim);
+}
+#era b{display:block; color:var(--ink); font-weight:400; font-size:12.5px; letter-spacing:.14em}
+
+#bar{position:fixed; z-index:5; left:0; top:0; height:1px; background:var(--hot); width:0; opacity:.75}
+
+@media (max-width:720px){
+  #hud{mix-blend-mode:normal; background:linear-gradient(transparent,rgba(8,9,11,.88) 45%)}
+  .col{max-width:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .col>*{transition-duration:.01ms}
+}
+</style>
+</head>
+<body>
+
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<main>
+  <section class="sheet" data-depth="0">
+    <div class="col">
+      <div class="tag"><b>000.0 m</b> Datum <span>Core 1 / 7</span></div>
+      <h1>STRATA</h1>
+      <p class="lede">A single core, three hundred metres long, stood on its end and lit from the inside.</p>
+      <p>Everything below you was once a surface. Every band is a horizon someone could have stood on. Scroll is not distance travelled — it is depth reached.</p>
+    </div>
+  </section>
+
+  <section class="sheet" data-depth="26">
+    <div class="col">
+      <div class="tag"><b>026.4 m</b> Soil &amp; till <span>Core 2 / 7</span></div>
+      <h2>The living layer stops early.</h2>
+      <p>Roots quit around two metres. Below that the ground keeps every temperature it is given, and gives none of it back. The first bands are loose — ground-up remains of rock that has already been somewhere else.</p>
+      <dl>
+        <div class="row"><dt>Matrix</dt><dd>unsorted till, sub-angular clasts</dd></div>
+        <div class="row"><dt>Colour</dt><dd>10YR 4/3 — dull yellow brown</dd></div>
+        <div class="row"><dt>Recovery</dt><dd>0.94</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="sheet" data-depth="72">
+    <div class="col">
+      <div class="tag"><b>072.1 m</b> Carbonate <span>Core 3 / 7</span></div>
+      <h2>Grey is a sea that took its time.</h2>
+      <p>Limestone is patience made solid — shell on shell on shell, none of it in a hurry. The bedding planes read like ruled paper. Each line is a pause in supply, which is to say a change in weather, which is to say a year nobody recorded.</p>
+      <dl>
+        <div class="row"><dt>Bedding</dt><dd>12–40 mm, planar, parallel</dd></div>
+        <div class="row"><dt>Fabric</dt><dd>bioclastic wackestone</dd></div>
+        <div class="row"><dt>Reaction</dt><dd>vigorous, cold dilute HCl</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="sheet" data-depth="128">
+    <div class="col">
+      <div class="tag"><b>128.6 m</b> Red beds <span>Core 4 / 7</span></div>
+      <h2>The red is rust. The rust is oxygen.</h2>
+      <p>Iron in these grains met free oxygen and never recovered. The colour is a record of an atmosphere — the only surviving photograph of air that has not existed for a very long time.</p>
+      <p>Cross-bedding here dips consistently. Wind had a preferred direction, and it held it for centuries.</p>
+      <dl>
+        <div class="row"><dt>Grain</dt><dd>fine–medium, well rounded, frosted</dd></div>
+        <div class="row"><dt>Cement</dt><dd>hematite, minor silica overgrowth</dd></div>
+        <div class="row"><dt>Dip</dt><dd>24° / 118° azimuth</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="sheet" data-depth="188">
+    <div class="col">
+      <div class="tag"><b>188.9 m</b> Black shale <span>Core 5 / 7</span></div>
+      <h2>Where the light budget runs out.</h2>
+      <p>Shale this dark means water that never mixed. Nothing on the floor to stir it, nothing alive to eat the carbon. The rock splits into sheets thinner than a fingernail and smells faintly of oil when it is freshly broken.</p>
+      <dl>
+        <div class="row"><dt>Fissility</dt><dd>strong, &lt; 1 mm</dd></div>
+        <div class="row"><dt>Organic C</dt><dd>4.8 % by weight</dd></div>
+        <div class="row"><dt>Pyrite</dt><dd>framboidal, disseminated</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="sheet" data-depth="244">
+    <div class="col">
+      <div class="tag"><b>244.2 m</b> Intrusive <span>Core 6 / 7</span></div>
+      <h2>Something hot came through sideways.</h2>
+      <p>A sheet of magma cut the bedding at an angle and cooked twenty centimetres of rock on either side of itself. The veins that branch off it are the cooling cracks, filled later by whatever the water was carrying.</p>
+      <dl>
+        <div class="row"><dt>Contact</dt><dd>sharp, chilled margin 18 mm</dd></div>
+        <div class="row"><dt>Veins</dt><dd>quartz–chalcopyrite, 2–9 mm</dd></div>
+        <div class="row"><dt>Temp.</dt><dd>est. 640 °C at emplacement</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="sheet" data-depth="300">
+    <div class="col">
+      <div class="tag"><b>300.0 m</b> Basement <span>Core 7 / 7</span></div>
+      <h2>Bottom of hole.</h2>
+      <p>Below this the rock has been melted and re-formed enough times that it no longer remembers being anything else. There are no more layers. There is no more record. The core barrel comes up warm.</p>
+      <p style="color:var(--faint);margin-top:34px;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase">End of log — 300.0 m — recovery 0.91</p>
+    </div>
+  </section>
+</main>
+
+<div id="bar"></div>
+<div id="hud">
+  <div id="depth">000.0<i>m</i></div>
+  <div id="era">Interval<b>Datum</b></div>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+const TOTAL   = 300;                       // metres of core
+const REDUCE  = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cv      = document.getElementById('gl');
+const elDepth = document.getElementById('depth');
+const elEra   = document.getElementById('era').querySelector('b');
+const elBar   = document.getElementById('bar');
+
+/* ---------------------------------------------------------------- reveal
+   ponytail: IntersectionObserver instead of a scroll-position engine.
+   The browser already computes this; asking it again in JS is just slower. */
+const io = new IntersectionObserver((es) => {
+  for (const e of es) {
+    if (!e.isIntersecting) continue;
+    e.target.querySelector('.col').classList.add('in');
+    /* the interval name is the bare text node between <b> and <span> */
+    elEra.textContent = e.target.querySelector('.tag').childNodes[2].textContent.trim();
+  }
+}, { rootMargin: '-30% 0px -30% 0px' });
+document.querySelectorAll('.sheet').forEach(s => io.observe(s));
+
+/* ----------------------------------------------------------------- shaders
+   One fullscreen triangle. No meshes, no buffers, no vertex data at all —
+   the geometry is a distance function, so there is nothing to upload. */
+const VERT = `#version 300 es
+void main(){
+  vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
+  gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
+}`;
+
+const FRAG = `#version 300 es
+precision highp float;
+out vec4 O;
+uniform vec2  uRes;
+uniform float uTime, uDepth, uFade;
+
+#define BAND 8.5
+#define TOTAL 300.0
+
+float h1(float n){ return fract(sin(n) * 43758.5453123); }
+
+float vn(vec3 x){
+  vec3 i = floor(x), f = fract(x);
+  f = f * f * (3.0 - 2.0 * f);
+  float n = i.x + i.y * 157.0 + 113.0 * i.z;
+  return mix(mix(mix(h1(n +   0.0), h1(n +   1.0), f.x),
+                 mix(h1(n + 157.0), h1(n + 158.0), f.x), f.y),
+             mix(mix(h1(n + 113.0), h1(n + 114.0), f.x),
+                 mix(h1(n + 270.0), h1(n + 271.0), f.x), f.y), f.z);
+}
+float fbm(vec3 p){
+  float a = 0.5, s = 0.0;
+  for (int i = 0; i < 4; i++){ s += a * vn(p); p *= 2.03; a *= 0.5; }
+  return s;
+}
+
+/* Positive inside the shaft, zero at the rock. Each BAND of depth gets its
+   own radius, bedding pitch and erosion frequency — that is what makes the
+   layers read as deposited rather than as noise. */
+float shaft(vec3 p){
+  float dep = -p.y;
+  float b   = floor(dep / BAND);
+  float h   = h1(b * 1.7 + 3.1);
+  float r   = 3.5 + h * 1.2 + sin(dep * 0.031) * 0.75;
+  float bed = sin(dep * (1.7 + h * 2.0)) * (0.09 + h * 0.15);
+  float er  = fbm(vec3(p.x, dep * (0.6 + h * 0.8), p.z) * (0.30 + h * 0.22)) * (0.9 + h * 0.8);
+  return r + bed - er - length(p.xz);
+}
+
+vec3 nrm(vec3 p){
+  vec2 e = vec2(0.02, 0.0);
+  return normalize(vec3(shaft(p + e.xyy) - shaft(p - e.xyy),
+                        shaft(p + e.yxy) - shaft(p - e.yxy),
+                        shaft(p + e.yyx) - shaft(p - e.yyx)));
+}
+
+vec3 rockColor(float e){
+  vec3 c = vec3(0.50, 0.41, 0.29);                                  /* soil     */
+  c = mix(c, vec3(0.40, 0.42, 0.45), smoothstep(0.03, 0.24, e));    /* limestone*/
+  c = mix(c, vec3(0.52, 0.25, 0.16), smoothstep(0.22, 0.44, e));    /* red beds */
+  c = mix(c, vec3(0.15, 0.16, 0.19), smoothstep(0.42, 0.64, e));    /* shale    */
+  c = mix(c, vec3(0.22, 0.24, 0.27), smoothstep(0.62, 0.80, e));    /* basalt   */
+  c = mix(c, vec3(0.34, 0.14, 0.09), smoothstep(0.79, 1.00, e));    /* basement */
+  return c;
+}
+vec3 veinColor(float e){
+  return mix(vec3(0.22, 0.86, 0.78), vec3(1.40, 0.46, 0.11), smoothstep(0.32, 0.90, e));
+}
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy * 2.0 - uRes) / uRes.y;
+
+  /* a slow spiral descent — the drill string turns as it goes down */
+  float yaw = uDepth * 0.052 + uTime * 0.012;
+  float pit = -0.60 + sin(uDepth * 0.020) * 0.10;
+
+  vec3 ro = vec3(sin(yaw * 0.7) * 1.15, -uDepth, cos(yaw * 0.7) * 1.15);
+  vec3 fw = vec3(cos(pit) * sin(yaw), sin(pit), cos(pit) * cos(yaw));
+  vec3 rt = normalize(cross(fw, vec3(0.0, 1.0, 0.0)));
+  vec3 up = cross(rt, fw);
+  vec3 rd = normalize(uv.x * rt + uv.y * up + 1.55 * fw);
+
+  float t = 0.1;
+  bool  hit = false;
+  for (int i = 0; i < 96; i++){
+    float d = shaft(ro + rd * t);
+    if (d < 0.004 * t){ hit = true; break; }
+    t += max(d * 0.55, 0.02);            /* 0.55: noise breaks the Lipschitz bound */
+    if (t > 90.0) break;
+  }
+
+  float era = clamp(uDepth / TOTAL, 0.0, 1.0);
+  vec3  col = vec3(0.0);
+
+  if (hit){
+    vec3  p  = ro + rd * t;
+    vec3  n  = nrm(p);
+    float be = clamp(-p.y / TOTAL, 0.0, 1.0);
+    vec3  al = rockColor(be) * (0.82 + 0.36 * h1(floor(-p.y / BAND) * 4.3 + 1.9));
+    al *= al;                                      /* authored sRGB → linear, or gamma lifts it to mud */
+
+    float lam  = max(dot(n, -rd), 0.0);
+    float fall = 1.0 / (1.0 + t * t * 0.055);      /* headlamp, inverse square-ish */
+
+    col  = al * (lam * 4.2 * fall + 0.015);
+    col += al * pow(1.0 - lam, 3.0) * 0.05;        /* grazing sheen on wet rock */
+
+    float v    = fbm(p * 0.75 + 9.0);
+    float vein = smoothstep(0.50, 0.56, v) * (1.0 - smoothstep(0.60, 0.68, v));
+    col += veinColor(be) * vein * (0.55 + 0.95 * be) * fall;
+  }
+
+  vec3 fog = mix(vec3(0.004, 0.005, 0.008), vec3(0.030, 0.008, 0.004), era);
+  col = mix(col, fog, 1.0 - exp(-t * 0.040));
+  col += vec3(0.10, 0.028, 0.008) * era * era * max(-rd.y, 0.0);  /* heat from below */
+
+  col = col / (1.0 + col);
+  col = pow(max(col, 0.0), vec3(0.4545));
+
+  vec2 q = gl_FragCoord.xy / uRes;
+  col *= 0.16 + 0.84 * pow(16.0 * q.x * q.y * (1.0 - q.x) * (1.0 - q.y), 0.42);
+  col += (h1(dot(gl_FragCoord.xy, vec2(12.9898, 78.233)) + uTime * 60.0) - 0.5) * 0.035;
+
+  O = vec4(max(col, 0.0) * uFade, 1.0);
+}`;
+
+/* ------------------------------------------------------------------ webgl */
+const gl = cv.getContext('webgl2', { antialias: false, alpha: false, depth: false, powerPreference: 'high-performance' });
+
+function compile(type, src){
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+
+let prog, U, scale = 1, running = false;
+const PERF = { acc: 0, n: 0 };
+let t0 = 0, depth = 0, target = 0;
+
+function initGL(){
+  prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+  gl.useProgram(prog);
+  U = ['uRes','uTime','uDepth','uFade'].reduce((m,k) => (m[k] = gl.getUniformLocation(prog,k), m), {});
+  resize();
+}
+
+function resize(){
+  const w = Math.max(1, Math.round(innerWidth  * scale * Math.min(devicePixelRatio, 2)));
+  const h = Math.max(1, Math.round(innerHeight * scale * Math.min(devicePixelRatio, 2)));
+  if (cv.width === w && cv.height === h) return;
+  cv.width = w; cv.height = h;
+  gl.viewport(0, 0, w, h);
+}
+
+const damp = (a, b, l, dt) => b + (a - b) * Math.exp(-l * dt);
+const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - innerHeight);
+
+let last = 0;
+function frame(now){
+  if (!running) return;
+  const raw = (now - last) / 1000 || 0;
+  const dt  = Math.min(raw, 0.05);
+  last = now;
+
+  /* ponytail: resolution governor only — no LOD system, no step-count tiers.
+     Add those when a real device shows resolution alone is not enough. */
+  if (now - t0 > 1500){
+    PERF.acc += raw; PERF.n++;
+    if (PERF.n >= 40){
+      const avg = PERF.acc / PERF.n; PERF.acc = 0; PERF.n = 0;
+      if      (avg > 0.023 && scale > 0.5) { scale = Math.max(0.5, scale * 0.82); resize(); }
+      else if (avg < 0.014 && scale < 1.0) { scale = Math.min(1.0, scale + 0.08); resize(); }
+    }
+  }
+
+  target = (scrollY / maxScroll()) * TOTAL;
+  depth  = REDUCE ? target : damp(depth, target, 4.5, dt);
+
+  elDepth.firstChild.nodeValue = depth.toFixed(1).padStart(5, '0');
+  elBar.style.width = (scrollY / maxScroll() * 100).toFixed(2) + '%';
+
+  gl.uniform2f(U.uRes, cv.width, cv.height);
+  gl.uniform1f(U.uTime, (now - t0) / 1000);
+  gl.uniform1f(U.uDepth, depth);
+  gl.uniform1f(U.uFade, Math.min(1, (now - t0) / 900));
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  requestAnimationFrame(frame);
+}
+
+/* the log is the content; the shaft is decoration. Losing it costs nothing. */
+if (!gl){
+  cv.classList.add('dead');
+} else {
+  try {
+    initGL();
+    running = true;
+    t0 = last = performance.now();
+    requestAnimationFrame(frame);
+    addEventListener('resize', resize, { passive: true });
+    document.addEventListener('visibilitychange', () => {
+      running = !document.hidden;
+      if (running){ last = performance.now(); requestAnimationFrame(frame); }
+    });
+  } catch (err){
+    console.error('[strata]', err);
+    cv.classList.add('dead');
+  }
+}
+})();
+</script>
+</body>
+</html>
